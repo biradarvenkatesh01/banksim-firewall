@@ -111,15 +111,15 @@ export function StressPanel({ report, loading, onClose }: StressPanelProps) {
                 borderBottom: "1px solid var(--rule)",
                 color: "var(--ink-3)",
                 textAlign: "left",
-                fontSize: "10px",
+                fontSize: "11px",
                 letterSpacing: "0.05em",
               }}
             >
-              <th style={{ padding: "8px 6px" }}>Variant & Technique</th>
-              <th style={{ padding: "8px 6px" }}>Preview Payload</th>
-              <th style={{ padding: "8px 6px" }}>Verdict</th>
-              <th style={{ padding: "8px 6px" }}>Risk</th>
-              <th style={{ padding: "8px 6px" }}>Category</th>
+              <th scope="col" style={{ padding: "8px 6px" }}>Variant & Technique</th>
+              <th scope="col" style={{ padding: "8px 6px" }}>Preview Payload</th>
+              <th scope="col" style={{ padding: "8px 6px" }}>Verdict</th>
+              <th scope="col" style={{ padding: "8px 6px" }}>Risk</th>
+              <th scope="col" style={{ padding: "8px 6px" }}>Category</th>
             </tr>
           </thead>
           <tbody>
@@ -159,7 +159,7 @@ export function StressPanel({ report, loading, onClose }: StressPanelProps) {
                         alignItems: "center",
                         gap: "4px",
                         padding: "2px 6px",
-                        fontSize: "10px",
+                        fontSize: "11px",
                         fontWeight: 700,
                         letterSpacing: "0.04em",
                         borderRadius: "2px",
@@ -168,7 +168,7 @@ export function StressPanel({ report, loading, onClose }: StressPanelProps) {
                         border: `1px solid ${isBlocked ? "var(--block)" : "var(--approve)"}`,
                       }}
                     >
-                      {isBlocked ? <PixelCross size={10} /> : <PixelCheck size={10} />}
+                      {isBlocked ? <PixelCross size={11} /> : <PixelCheck size={11} />}
                       {v.status}
                     </span>
                   </td>
@@ -185,7 +185,7 @@ export function StressPanel({ report, loading, onClose }: StressPanelProps) {
                     <span
                       className="font-pixel"
                       style={{
-                        fontSize: "10px",
+                        fontSize: "11px",
                         letterSpacing: "0.04em",
                         color: "var(--ink-2)",
                         whiteSpace: "normal",

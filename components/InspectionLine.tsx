@@ -20,9 +20,12 @@ const STATIONS: { num: string; key: string; name: string; defaultDetail: string 
 ];
 
 export function InspectionLine({ pipeline }: InspectionLineProps) {
-  // Map pipeline steps by stage
+  // Map pipeline steps by stage safely
+  const safePipeline = Array.isArray(pipeline) ? pipeline : [];
   const stageMap = new Map<string, PipelineStage>();
-  pipeline.forEach((p) => stageMap.set(p.stage, p));
+  safePipeline.forEach((p) => {
+    if (p && p.stage) stageMap.set(p.stage, p);
+  });
 
   return (
     <div
@@ -175,7 +178,7 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
                       <span
                         className="font-pixel"
                         style={{
-                          fontSize: "10px",
+                          fontSize: "11px",
                           color: "var(--block)",
                           fontWeight: 700,
                           letterSpacing: "0.05em",

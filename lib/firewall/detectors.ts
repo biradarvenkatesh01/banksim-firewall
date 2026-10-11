@@ -350,6 +350,12 @@ export function primaryCategory(signals: readonly Signal[]): AttackCategory | nu
   return top.category;
 }
 
+/**
+ * Scans normalized message and memo fields against all deterministic threat signatures.
+ *
+ * @param input - Pre-extracted message and array of memo strings.
+ * @returns ScanResult containing identified signals, aggregate noisy-OR rule risk (0–100), and normalized views.
+ */
 export function scan(input: ScanInput): ScanResult {
   const message = normalizeText(input.message);
   const memos = input.memos.map((m) => normalizeText(m));

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runStressTest } from "@/lib/firewall/stress";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { validateStressRequest } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
@@ -15,18 +16,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const message = typeof body?.message === "string" ? body.message : "";
-    const memo = typeof body?.memo === "string" ? body.memo : null;
-
-    if (!message.trim()) {
-      return NextResponse.json(
-        { error: "Message must be a non-empty string." },
-        { status: 400 }
-      );
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Malformed JSON payload." }, { status: 400 });
     }
 
-    const report = await runStressTest(message, memo);
+    const validation = validateStressRequest(body);
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: validation.status });
+    }
+
+    const { message, memo } = validation.data;
+    const report = await runStressTest(message, memo ?? null);
     return NextResponse.json(report, { status: 200 });
   } catch (err) {
     return NextResponse.json(

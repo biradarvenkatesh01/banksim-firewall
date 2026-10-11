@@ -120,6 +120,7 @@ export function AccountCard({ state, onReset, isResetting }: AccountCardProps) {
             onClick={handleReset}
             disabled={isResetting}
             className="btn-link"
+            aria-label="Reset ledger balance and transactions to demo state"
             style={{ fontSize: "12px", color: "var(--ink-3)" }}
             title="Reset ledger balance and transactions to demo state"
           >

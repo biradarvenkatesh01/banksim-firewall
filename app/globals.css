@@ -1,5 +1,28 @@
 @import "./styles/tokens.css";
 
+/* Skip Link for Keyboard Accessibility */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 16px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  padding: 8px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  z-index: 9999;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+}
+.skip-link:focus {
+  top: 16px;
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
 /* Container */
 .container {
   width: 100%;

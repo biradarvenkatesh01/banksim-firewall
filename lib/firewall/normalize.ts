@@ -331,6 +331,12 @@ function basicCanonical(s: string): { text: string; invisible: boolean; tagPaylo
   };
 }
 
+/**
+ * Normalizes untrusted text across multiple defensive views (NFKC, homoglyphs, leetspeak, despaced, base64/hex decode).
+ *
+ * @param original - Raw input text from message or memo.
+ * @returns NormalizedText containing canonical representation, multi-view variants, and detected obfuscation flags.
+ */
 export function normalizeText(original: string): NormalizedText {
   const flags = new Set<ObfuscationFlag>();
   const views: TextView[] = [];

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { analyze } from "@/lib/firewall";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { recordAuditEvent } from "@/lib/firewall/audit";
+import { validateAnalyzeRequest } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
@@ -59,23 +60,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+  // 4. Schema validation
+  const validation = validateAnalyzeRequest(body);
+  if (!validation.ok) {
     return NextResponse.json(
-      {
-        error: "Request body must be a JSON object containing a 'message' property.",
-      },
-      { status: 400 }
+      { error: validation.error },
+      { status: validation.status }
     );
   }
 
-  const payload = body as Record<string, unknown>;
-  const message = typeof payload.message === "string" ? payload.message : "";
-  const memo = typeof payload.memo === "string" ? payload.memo : null;
-  const dryRun = Boolean(payload.dry_run);
+  const { message, memo, dry_run: dryRun } = validation.data;
 
   try {
+    // Message passed into analyze: string or non-string (handled by checkContract)
     const verdict = await analyze(
-      { message, memo },
+      { message: message as string, memo },
       { dryRun }
     );
 
@@ -91,9 +90,9 @@ export async function POST(req: NextRequest) {
       status: verdict.status,
       risk_score: verdict.risk_score,
       threat_category: verdict.threat_category,
-      input_excerpt: (message + (memo ? ` [memo: ${memo}]` : "")).slice(0, 100),
-      message,
-      memo,
+      input_excerpt: (String(message) + (memo ? ` [memo: ${memo}]` : "")).slice(0, 100),
+      message: String(message),
+      memo: memo ?? null,
       stopping_stage: stoppingStage,
       latency_ms: verdict.engine.latency_ms,
       verdict,

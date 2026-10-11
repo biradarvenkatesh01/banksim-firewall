@@ -423,3 +423,18 @@ npm run dev
 2. **Fixed Payee Directory**: Payees are validated against a pre-registered mock directory (`PAYEES`). Transfers to arbitrary external accounts are rejected by policy as `POL-PAYEE-VERIFIED`.
 3. **Language Scope**: Natural language parsing is optimized for English and Hinglish (Hindi written in Latin script) with basic Devanagari memo support. Complex multi-lingual Indian regional languages (Kannada, Tamil, Telugu) currently rely on the LLM semantic layer.
 4. **Latency vs. Cost**: Rules-only execution completes in **< 15ms**. Calling the Groq cloud semantic layer introduces **600–1200ms** network round-trip latency. In high-frequency production banking, the LLM layer should be invoked asynchronously or reserved for the "grey zone" (risk 25–49).
+
+---
+
+## 9. Quality Gates
+
+All automated engineering quality gates are verified green:
+
+| Gate | Command | Scope | Current Result |
+| :--- | :--- | :--- | :--- |
+| **Type Check** | `npx tsc --noEmit` | Strict TypeScript checking across all routes, components, and engine libraries | `0 errors` |
+| **Lint** | `npm run lint` | ESLint (Next.js Core Web Vitals + TypeScript) | `0 errors, 0 warnings` |
+| **Unit & Integration Tests** | `npm test` | 149 Vitest tests across firewall engine and all API routes | `149/149 passed (100%)` |
+| **Test Coverage** | `npm run test:coverage` | V8 code coverage report on engine and handlers | `~80% line coverage` |
+| **Red-Team Benchmark** | `npm run eval` | 102 red-team attack & legitimate test vectors | `102/102 passed (100.0% accuracy, 0 FP, 0 FN)` |
+| **Production Build** | `npm run build` | Next.js 16 production build | `11/11 routes compiled` |

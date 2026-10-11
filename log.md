@@ -17,8 +17,10 @@ This file records every prompt given to the Google Antigravity agent to build Ba
 | **09** | Prompt log cleanup | Restructure log.md into clean jury-ready prompt log, remove outcomes and recovery artifacts, and establish permanent logging rules. |
 | **10** | Standout features — ledger, threat feed, evidence, stress test | Add live ledger, bounded threat feed & audit store, character-level evidence highlighting, mutation stress-test generator, and session analytics strip. |
 | **11** | Visual identity — paper texture, pixel accents, motion | Risograph paper grain, 1-bit dither dividers, Silkscreen pixel font for micro-UI, crisp SVG pixel icons, and dot-matrix receipt printing motion. |
-| **12** | Visual QA fixes — caret, mobile stamp | Fix hero caret sizing and inline flow; clamp receipt stamp on mobile (390px) to prevent card overflow. |
+| **12** | Visual QA fixes — caret, mobile stamp | Fix hero caret sizing and inline illflow; clamp receipt stamp on mobile (390px) to prevent card overflow. |
 | **13** | Attack Library label overlap fix | Expand Attack Library column width, make category chips wrap safely with underscores replaced by spaces, and stack responsively under 700px. |
+| **14** | Engineering hardening — tests, accessibility, security, lint | Vitest API route tests, test coverage script, request body schemas, security headers, SECURITY.md, full accessibility markup, ESLint config, and public TSDoc. |
+| **15** | Fix Hero crash after request validation | Align client request keys with validation schema (dry_run / dryRun), make verdict property access defensive in Hero component. |
 
 ---
 
@@ -432,5 +434,53 @@ FIX in AttackLibrary.tsx only:
 - At <700px stack the row: label + id on top, payload below, "Try →" right-aligned.
 Apply the same overflow-safe treatment to any other pixel-font category chips that sit in table columns (Threat Feed, Red Team table, Stress panel).
 Then run `npx tsc --noEmit` and `npm run build` and reply "done" in chat. Do not do browser testing.
+```
+
+---
+
+## Prompt 14 — Engineering hardening — tests, accessibility, security, lint
+
+_Phase: Engineering Hardening & Automated Review · Model: Gemini 3.8 Flash_
+
+```text
+Log this prompt using the new log format (title: "Engineering hardening — tests, accessibility, security, lint"). No git commands. HARD TIME LIMIT: finish within 20 minutes. NO browser testing. NO visual/design changes. NO changes to engine decision logic, thresholds, or the corpus. Only ADDITIVE, low-risk changes.
+
+ROLE: senior staff engineer preparing the repo for an automated code review that scores Code Quality, Security, Efficiency, Testing, Accessibility and Problem-Statement Alignment.
+
+1. TESTING (highest priority)
+- Add Vitest tests for every API route handler by importing the route functions directly (no server): /api/analyze (approved transfer, blocked injection, malformed JSON → 400, body > 8 KB → 413 or 400, non-string message → INVALID_INPUT), /api/account (GET shape), /api/account/reset, /api/audit (bounded to 100), /api/stress (10 variants, all blocked for an injection), /api/redteam (summary 100%), /api/health (mode + thresholds).
+- Add `"test:coverage": "vitest run --coverage"` (install @vitest/coverage-v8 as a devDependency) and a `coverage/` entry in .gitignore.
+2. SECURITY
+- Validate every API request body with an explicit schema/type-guard helper in `lib/validation.ts` (types, lengths, allowed keys; reject unknown keys) and use it in all POST routes.
+- In next.config, ensure headers: Content-Security-Policy (default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'), X-Content-Type-Options nosniff, Referrer-Policy no-referrer, Permissions-Policy (camera=(), microphone=(), geolocation=()), Strict-Transport-Security. Keep anything already needed for fonts/Next to work.
+- Add SECURITY.md: threat model summary, defence layers, how secrets are handled (env only), how to report issues.
+3. ACCESSIBILITY (markup-only, no visual change)
+- aria-label on every icon-only or ambiguous button; visible :focus-visible styles kept; keyboard equivalent for any hover-only interaction (rows clickable via Enter/Space with role="button" tabIndex=0); a "Skip to console" link as the first focusable element (visually hidden until focused); <th scope="col"> on all table headers; aria-live="polite" on verdict/stress/feed regions if missing; ensure pixel-font text is never below 11px.
+4. CODE QUALITY
+- Add an ESLint config (next/core-web-vitals + typescript) and an `npm run lint` script; fix all lint errors (warnings ok).
+- Delete any unused files/exports and any scratch/test-only files left in the repo root (e.g. scratch_*.mjs, test-*.mjs) — keep scripts/ and tests/.
+- Add concise TSDoc comments to the public functions in lib/firewall (analyze, normalize, detect, parse, policy, llm classify).
+5. EFFICIENCY
+- Memoize expensive derived values in the heaviest components with useMemo/useCallback where it is clearly safe; avoid duplicate fetches of /api/account and /api/audit after one analysis (fetch once, share).
+6. README: add a short "Quality gates" section listing the commands (test, test:coverage, lint, eval, build) and their current results.
+
+FINISH: run `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run eval`, `npm run build`. All must pass. Report the results in chat in 5 lines, then STOP. Keep the dev server running.
+```
+
+---
+
+## Prompt 15 — Fix Hero crash after request validation
+
+_Phase: Visual QA & Micro-Polish · Model: Gemini 3.8 Flash_
+
+```text
+Log this prompt using the new log format (title: "Fix Hero crash after request validation"). No git commands. No other changes.
+
+BUG (found by live test at http://localhost:3000): the whole home page now shows "This page couldn't load". Console: `TypeError: Cannot read properties of undefined (reading 'slice') at Hero`. The API routes themselves still work.
+Likely cause: the new strict body validation (lib/validation.ts, unknown keys rejected) rejects the request Hero.tsx sends for its live demo receipt (or another component's request), so Hero receives an error object without the expected fields and calls .slice on undefined.
+FIX:
+1. Check every client-side fetch body (Hero, Composer/page, StressPanel, RedTeam, LedgerThreatFeed, AccountCard) against lib/validation.ts and make them match exactly (or allow the keys they legitimately send).
+2. Make Hero (and any component that reads verdict fields) defensive: if the response is not ok or a field is missing, render a graceful fallback instead of crashing (use optional chaining, e.g. verdict?.request_id?.slice(...) ?? "—").
+3. Run `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run build`, then load http://localhost:3000 once (just check the page renders and the hero receipt shows BLOCKED) and report in chat. Then STOP.
 ```
 

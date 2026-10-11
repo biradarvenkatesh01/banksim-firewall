@@ -35,6 +35,13 @@ export interface RiskDecision {
   reason: string;
 }
 
+/**
+ * Evaluates numerical risk score against security thresholds with fail-closed grey zone semantics.
+ *
+ * @param riskScore - Combined risk score from signature scanning (0–100).
+ * @param llmVerdict - Optional semantic classifier opinion for grey-zone arbitration.
+ * @returns RiskDecision containing status (APPROVED/BLOCKED) and justification.
+ */
 export function evaluateRiskThreshold(
   riskScore: number,
   llmVerdict?: { is_attack: boolean; confidence: number } | null
@@ -74,6 +81,14 @@ export interface PolicyEvaluation {
   explanation: string;
 }
 
+/**
+ * Validates banking business rules (per-txn limits, daily velocity, payee KYC, balance availability).
+ *
+ * @param parse - Parsed intent and arguments.
+ * @param bankState - Current bank ledger state.
+ * @param rawText - Original raw input string.
+ * @returns PolicyEvaluation indicating whether request complies with banking guardrails.
+ */
 export function evaluatePolicy(
   parse: ParseResult,
   bankState: BankState,

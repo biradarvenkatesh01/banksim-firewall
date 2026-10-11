@@ -41,6 +41,13 @@ export interface AnalyzeOptions {
   state?: BankState;
 }
 
+/**
+ * Intercepts, sanitizes, and analyzes an incoming user request through the 8-stage zero-trust firewall pipeline.
+ *
+ * @param input - The untrusted user request containing message and optional memo.
+ * @param options - Analysis configuration including dry-run mode, LLM enablement, and custom bank state.
+ * @returns Comprehensive Verdict object with approval status, risk score, threat category, and pipeline audit trail.
+ */
 export async function analyze(
   input: FirewallInput,
   options: AnalyzeOptions = {}

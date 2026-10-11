@@ -190,6 +190,7 @@ export function TopBar() {
             type="button"
             onClick={toggleTheme}
             className="font-mono"
+            aria-label="Toggle color theme between light and dark"
             style={{
               fontSize: "12px",
               color: "var(--ink-2)",

@@ -54,7 +54,7 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
     );
   }
 
-  if (!verdict) {
+  if (!verdict || !verdict.request_id) {
     return (
       <div style={{ position: "relative", marginBottom: "24px" }}>
         <div className="receipt-perforation-top" />
@@ -100,6 +100,7 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
         key={verdict.request_id}
         className="receipt-card receipt-print-reveal"
         style={{ position: "relative" }}
+        aria-live="polite"
       >
         <PixelViewfinderCorners color="var(--ink-3)" size={6} />
 

@@ -7,7 +7,8 @@ interface RiskDialProps {
 }
 
 export function RiskDial({ score }: RiskDialProps) {
-  const clampedScore = Math.max(0, Math.min(100, Math.round(score)));
+  const numericScore = typeof score === "number" && !isNaN(score) ? score : 0;
+  const clampedScore = Math.max(0, Math.min(100, Math.round(numericScore)));
 
   const [animatedScore, setAnimatedScore] = useState<number>(0);
   const prevScoreRef = useRef<number>(0);

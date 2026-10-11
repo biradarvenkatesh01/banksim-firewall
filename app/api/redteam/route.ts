@@ -1,9 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { analyze } from "../../../lib/firewall";
 import { createBankState } from "../../../lib/firewall/bank";
 import { ATTACK_CASES, LEGIT_CASES } from "../../../lib/firewall/corpus";
+import { validateEmptyBody } from "@/lib/validation";
 
-export async function POST() {
+export async function POST(req?: NextRequest) {
+  if (req) {
+    try {
+      const text = await req.text();
+      if (text.trim()) {
+        const json = JSON.parse(text);
+        const valid = validateEmptyBody(json);
+        if (!valid.ok) {
+          return NextResponse.json({ error: valid.error }, { status: valid.status });
+        }
+      }
+    } catch {
+      return NextResponse.json({ error: "Malformed JSON payload." }, { status: 400 });
+    }
+  }
+
   const allCases = [...ATTACK_CASES, ...LEGIT_CASES];
   const results = [];
 

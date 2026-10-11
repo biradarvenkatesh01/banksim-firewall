@@ -21,16 +21,20 @@ export function LedgerThreatFeed({
   auditData,
   onSelectVerdict,
 }: LedgerThreatFeedProps) {
-  const transactions = bankState?.transactions ?? [];
-  const threatFeed = auditData?.threat_feed ?? [];
-  const analytics = auditData?.analytics ?? {
-    total: 0,
-    blocked: 0,
-    approved: 0,
-    block_rate_pct: 0,
-    avg_latency_ms: 0,
-    category_counts: {},
-  };
+  const transactions = React.useMemo(() => bankState?.transactions ?? [], [bankState?.transactions]);
+  const threatFeed = React.useMemo(() => auditData?.threat_feed ?? [], [auditData?.threat_feed]);
+  const analytics = React.useMemo(
+    () =>
+      auditData?.analytics ?? {
+        total: 0,
+        blocked: 0,
+        approved: 0,
+        block_rate_pct: 0,
+        avg_latency_ms: 0,
+        category_counts: {},
+      },
+    [auditData?.analytics]
+  );
 
   const handleExportAudit = () => {
     if (!auditData?.events || auditData.events.length === 0) return;
@@ -296,16 +300,16 @@ export function LedgerThreatFeed({
                       borderBottom: "1px solid var(--rule)",
                       color: "var(--ink-3)",
                       textAlign: "left",
-                      fontSize: "10px",
+                      fontSize: "11px",
                       letterSpacing: "0.05em",
                     }}
                   >
-                    <th style={{ padding: "8px 6px" }}>Time</th>
-                    <th style={{ padding: "8px 6px" }}>Counterparty</th>
-                    <th style={{ padding: "8px 6px" }}>Memo</th>
-                    <th style={{ padding: "8px 6px", textAlign: "right" }}>Amount</th>
-                    <th style={{ padding: "8px 6px", textAlign: "right" }}>Balance</th>
-                    <th style={{ padding: "8px 6px" }}>Auth ID</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Time</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Counterparty</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Memo</th>
+                    <th scope="col" style={{ padding: "8px 6px", textAlign: "right" }}>Amount</th>
+                    <th scope="col" style={{ padding: "8px 6px", textAlign: "right" }}>Balance</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Auth ID</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -488,15 +492,15 @@ export function LedgerThreatFeed({
                       borderBottom: "1px solid var(--rule)",
                       color: "var(--ink-3)",
                       textAlign: "left",
-                      fontSize: "10px",
+                      fontSize: "11px",
                       letterSpacing: "0.05em",
                     }}
                   >
-                    <th style={{ padding: "8px 6px" }}>Time</th>
-                    <th style={{ padding: "8px 6px" }}>Category</th>
-                    <th style={{ padding: "8px 6px" }}>Risk</th>
-                    <th style={{ padding: "8px 6px" }}>Stopped At</th>
-                    <th style={{ padding: "8px 6px" }}>Excerpt</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Time</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Category</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Risk</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Stopped At</th>
+                    <th scope="col" style={{ padding: "8px 6px" }}>Excerpt</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -504,6 +508,15 @@ export function LedgerThreatFeed({
                     <tr
                       key={ev.id}
                       onClick={() => onSelectVerdict(ev.verdict)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Inspect verdict for request ${ev.id}: ${ev.threat_category}`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onSelectVerdict(ev.verdict);
+                        }
+                      }}
                       className="interactive-table-row"
                       style={{
                         borderBottom: "1px solid var(--rule)",
@@ -522,7 +535,7 @@ export function LedgerThreatFeed({
                             alignItems: "center",
                             gap: "4px",
                             padding: "2px 6px",
-                            fontSize: "10px",
+                            fontSize: "11px",
                             fontWeight: 700,
                             letterSpacing: "0.04em",
                             borderRadius: "2px",
@@ -534,7 +547,7 @@ export function LedgerThreatFeed({
                             lineHeight: 1.3,
                           }}
                         >
-                          <PixelWarning size={10} />
+                          <PixelWarning size={11} />
                           {ev.threat_category.replace(/_/g, " ")}
                         </span>
                       </td>

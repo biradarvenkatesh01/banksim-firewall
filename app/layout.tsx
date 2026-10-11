@@ -52,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} ${pixelFont.variable}`}
     >
       <body>
+        <a href="#console" className="skip-link">Skip to console</a>
         <div className="paper-grain" aria-hidden="true" />
         <svg style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }} aria-hidden="true">
           <filter id="ink-noise" x="0%" y="0%" width="100%" height="100%">

@@ -268,7 +268,7 @@ export function RedTeam() {
                 padding: "10px 16px",
                 backgroundColor: "var(--paper)",
                 borderBottom: "1px solid var(--rule)",
-                fontSize: "10px",
+                fontSize: "11px",
                 color: "var(--ink-3)",
                 letterSpacing: "0.05em",
                 textTransform: "uppercase",
@@ -306,7 +306,7 @@ export function RedTeam() {
                         display: "inline-block",
                         padding: "2px 6px",
                         borderRadius: "3px",
-                        fontSize: "10px",
+                        fontSize: "11px",
                         fontWeight: 700,
                         letterSpacing: "0.04em",
                         backgroundColor: r.passed ? "var(--approve-bg)" : "var(--block-bg)",
@@ -321,7 +321,7 @@ export function RedTeam() {
                   <span
                     className="font-pixel"
                     style={{
-                      fontSize: "10px",
+                      fontSize: "11px",
                       letterSpacing: "0.04em",
                       fontWeight: 600,
                       color: r.actualStatus === "APPROVED" ? "var(--approve)" : "var(--block)",
@@ -339,7 +339,7 @@ export function RedTeam() {
                   <span
                     className="font-pixel"
                     style={{
-                      fontSize: "10px",
+                      fontSize: "11px",
                       letterSpacing: "0.04em",
                       color: r.threat_category === "NONE" ? "var(--ink-3)" : "var(--ink)",
                       whiteSpace: "normal",

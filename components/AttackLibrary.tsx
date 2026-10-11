@@ -150,7 +150,7 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
                 <span
                   className="font-pixel"
                   style={{
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 700,
                     color: c.expectedStatus === "BLOCKED" ? "var(--block)" : "var(--approve)",
                     letterSpacing: "0.04em",

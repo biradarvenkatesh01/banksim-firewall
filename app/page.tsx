@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { TopBar } from "../components/TopBar";
 import { Hero } from "../components/Hero";
 import { AccountCard } from "../components/AccountCard";
@@ -41,7 +41,7 @@ export default function Home() {
   const [verdict, setVerdict] = useState<Verdict | null>(null);
 
   // Fetch account ledger state
-  const fetchAccount = async () => {
+  const fetchAccount = useCallback(async () => {
     try {
       const res = await fetch("/api/account");
       if (res.ok) {
@@ -51,10 +51,10 @@ export default function Home() {
     } catch {
       // Offline fallback
     }
-  };
+  }, []);
 
   // Fetch session audit & threat feed state
-  const fetchAudit = async () => {
+  const fetchAudit = useCallback(async () => {
     try {
       const res = await fetch("/api/audit");
       if (res.ok) {
@@ -64,11 +64,10 @@ export default function Home() {
     } catch {
       // Offline fallback
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchAccount();
-    fetchAudit();
+    Promise.all([fetchAccount(), fetchAudit()]);
 
     if (typeof window !== "undefined" && "IntersectionObserver" in window) {
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -118,6 +117,7 @@ export default function Home() {
         body: JSON.stringify({
           message,
           memo: memo.trim() || null,
+          dry_run: dryRun,
           dryRun,
         }),
       });
@@ -128,13 +128,12 @@ export default function Home() {
       }
 
       const data: Verdict = await res.json();
-      setVerdict(data);
-
-      // Re-fetch after every analysis (audit feed + ledger)
-      await fetchAudit();
-      if (!dryRun) {
-        await fetchAccount();
+      if (data && typeof data === "object" && typeof data.request_id === "string") {
+        setVerdict(data);
       }
+
+      // Re-fetch after analysis concurrently (audit feed + ledger)
+      await Promise.all([fetchAudit(), !dryRun ? fetchAccount() : Promise.resolve()]);
     } catch (e: unknown) {
       const err = e as Error;
       setError(err?.message || "Analysis request failed.");

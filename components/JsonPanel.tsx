@@ -35,7 +35,17 @@ export function JsonPanel({ verdict }: JsonPanelProps) {
       }}
     >
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-label="Toggle raw verdict JSON view"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -89,6 +99,7 @@ export function JsonPanel({ verdict }: JsonPanelProps) {
               type="button"
               onClick={handleCopy}
               className="btn-secondary"
+              aria-label="Copy raw verdict JSON to clipboard"
               style={{
                 fontSize: "11px",
                 padding: "4px 10px",

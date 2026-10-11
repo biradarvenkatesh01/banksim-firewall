@@ -101,6 +101,13 @@ function getSystemPrompt(): string {
   return BUNDLED_SYSTEM_PROMPT;
 }
 
+/**
+ * Performs secondary semantic classification of untrusted input using Groq LLM with strict canary tokens and JSON schema validation.
+ *
+ * @param message - User message text.
+ * @param memo - Optional transaction memo string.
+ * @returns SemanticClassificationResult containing LLM verdict, latency, and enabled state.
+ */
 export async function classifyWithLLM(
   message: string,
   memo: string | null = null

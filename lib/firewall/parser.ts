@@ -172,7 +172,11 @@ export function resolvePayee(text: string): { payee: Payee | null; ambiguous: st
 }
 
 /**
- * Deterministic intent grammar on normalized text.
+ * Deterministically parses banking intents (balance, transfer, history, help) and extracts arguments via strict grammar.
+ *
+ * @param rawInput - Raw or normalized user input text.
+ * @param explicitMemo - Optional transaction memo field.
+ * @returns ParseResult containing candidate tool invocation, intent classification, and any grammar violations.
  */
 export function parseIntent(rawInput: string, explicitMemo?: string | null): ParseResult {
   const { cleanText, inlineMemo } = extractInlineMemo(rawInput);
