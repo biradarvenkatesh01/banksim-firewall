@@ -1,6 +1,7 @@
-"use client";
-
 import React from "react";
+import type { Verdict } from "../lib/firewall/schema";
+import { EvidenceViewer } from "./EvidenceViewer";
+import { PixelViewfinderCorners } from "./PixelIcons";
 
 interface ComposerProps {
   message: string;
@@ -8,6 +9,9 @@ interface ComposerProps {
   onMessageChange: (v: string) => void;
   onMemoChange: (v: string) => void;
   onSubmit: (dryRun: boolean) => void;
+  onStressTest?: () => void;
+  stressLoading?: boolean;
+  verdict?: Verdict | null;
   loading: boolean;
   error: string | null;
 }
@@ -18,6 +22,9 @@ export function Composer({
   onMessageChange,
   onMemoChange,
   onSubmit,
+  onStressTest,
+  stressLoading = false,
+  verdict,
   loading,
   error,
 }: ComposerProps) {
@@ -37,8 +44,10 @@ export function Composer({
         border: "1px solid var(--rule)",
         borderRadius: "var(--radius-md)",
         padding: "24px",
+        position: "relative",
       }}
     >
+      <PixelViewfinderCorners color="var(--ink-3)" size={6} />
       <div
         style={{
           fontSize: "12px",
@@ -173,7 +182,22 @@ export function Composer({
               disabled={loading || !message.trim()}
               className="btn-primary"
             >
-              {loading ? "Inspecting…" : "Analyze & execute"}
+              {loading ? (
+                <span
+                  className="font-pixel"
+                  style={{
+                    fontSize: "12px",
+                    letterSpacing: "0.06em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "2px",
+                  }}
+                >
+                  INSPECTING<span className="pixel-dots">...</span>
+                </span>
+              ) : (
+                "Analyze & execute"
+              )}
             </button>
             <button
               type="button"
@@ -183,6 +207,22 @@ export function Composer({
             >
               Dry run
             </button>
+            {onStressTest && (
+              <button
+                type="button"
+                disabled={loading || stressLoading || !message.trim()}
+                onClick={onStressTest}
+                className="btn-secondary font-mono"
+                style={{
+                  fontSize: "12px",
+                  borderColor: "var(--navy)",
+                  color: "var(--navy)",
+                }}
+                title="Deterministically generate 10 obfuscated variants and test firewall evasion resilience"
+              >
+                {stressLoading ? "Stress-testing…" : "Stress-test this attack"}
+              </button>
+            )}
             <button
               type="button"
               disabled={loading || (!message && !memo)}
@@ -212,6 +252,13 @@ export function Composer({
           </span>
         </div>
       </form>
+
+      {/* F2: Evidence Highlighting */}
+      <EvidenceViewer
+        message={message}
+        memo={memo || null}
+        signals={verdict?.signals ?? []}
+      />
     </div>
   );
 }

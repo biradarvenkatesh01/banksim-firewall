@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 interface RiskDialProps {
   score: number;
@@ -8,6 +8,48 @@ interface RiskDialProps {
 
 export function RiskDial({ score }: RiskDialProps) {
   const clampedScore = Math.max(0, Math.min(100, Math.round(score)));
+
+  const [animatedScore, setAnimatedScore] = useState<number>(0);
+  const prevScoreRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setAnimatedScore(clampedScore);
+      prevScoreRef.current = clampedScore;
+      return;
+    }
+
+    const startVal = prevScoreRef.current;
+    const endVal = clampedScore;
+    let startTime: number | null = null;
+    const duration = 500;
+
+    const animate = (timestamp: number) => {
+      if (startTime === null) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      // ease-out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = startVal + (endVal - startVal) * ease;
+      setAnimatedScore(current);
+
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setAnimatedScore(endVal);
+        prevScoreRef.current = endVal;
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [clampedScore]);
 
   // Determine colour based on score band
   const color =
@@ -50,8 +92,8 @@ export function RiskDial({ score }: RiskDialProps) {
   };
 
   const backgroundArc = describeArc(startAngle, startAngle + totalSweep);
-  const currentEndAngle = startAngle + (clampedScore / 100) * totalSweep;
-  const valueArc = clampedScore > 0 ? describeArc(startAngle, currentEndAngle) : "";
+  const currentEndAngle = startAngle + (animatedScore / 100) * totalSweep;
+  const valueArc = animatedScore > 0 ? describeArc(startAngle, currentEndAngle) : "";
 
   // Ticks every 10 plus threshold 25
   const ticks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -99,15 +141,15 @@ export function RiskDial({ score }: RiskDialProps) {
             strokeLinecap="round"
           />
 
-          {/* Active Value Arc */}
-          {clampedScore > 0 && (
+          {/* Active Value Arc sweeping from 0 to value */}
+          {animatedScore > 0 && (
             <path
               d={valueArc}
               fill="none"
               stroke={color}
               strokeWidth="5"
               strokeLinecap="round"
-              style={{ transition: "stroke 240ms ease-out, d 240ms ease-out" }}
+              style={{ transition: "stroke 240ms ease-out" }}
             />
           )}
 
@@ -150,7 +192,7 @@ export function RiskDial({ score }: RiskDialProps) {
 
           {/* Needle / indicator dot on arc */}
           {(() => {
-            const angle = startAngle + (clampedScore / 100) * totalSweep;
+            const angle = startAngle + (animatedScore / 100) * totalSweep;
             const p = getPoint(cx, cy, r, angle);
             return (
               <circle
@@ -160,20 +202,21 @@ export function RiskDial({ score }: RiskDialProps) {
                 fill={color}
                 stroke="var(--paper-raised)"
                 strokeWidth="2"
-                style={{ transition: "cx 240ms ease-out, cy 240ms ease-out, fill 240ms ease-out" }}
+                style={{ transition: "fill 240ms ease-out" }}
               />
             );
           })()}
 
-          {/* Outside Labels: 10px mono with >=6px clearance */}
+          {/* Outside Labels: Silkscreen pixel font with >=6px clearance */}
           <text
             x="36"
             y="76"
             fill="var(--amber)"
-            fontSize="10"
-            fontFamily="var(--font-mono)"
+            fontSize="11"
+            fontFamily="var(--font-pixel)"
             textAnchor="end"
-            fontWeight="500"
+            fontWeight="700"
+            letterSpacing="0.04em"
           >
             grey 25
           </text>
@@ -181,10 +224,11 @@ export function RiskDial({ score }: RiskDialProps) {
             x="120"
             y="16"
             fill="var(--block)"
-            fontSize="10"
-            fontFamily="var(--font-mono)"
+            fontSize="11"
+            fontFamily="var(--font-pixel)"
             textAnchor="middle"
-            fontWeight="500"
+            fontWeight="700"
+            letterSpacing="0.04em"
           >
             block 50
           </text>
@@ -211,7 +255,7 @@ export function RiskDial({ score }: RiskDialProps) {
             100
           </text>
 
-          {/* Centre shows ONLY the big tabular number */}
+          {/* Centre shows ONLY the big tabular number with 500ms count-up */}
           <text
             x="120"
             y="126"
@@ -222,7 +266,7 @@ export function RiskDial({ score }: RiskDialProps) {
             fill={color}
             style={{ transition: "fill 240ms ease-out" }}
           >
-            {clampedScore}
+            {Math.round(animatedScore)}
           </text>
         </svg>
       </div>

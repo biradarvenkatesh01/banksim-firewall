@@ -2,32 +2,27 @@
 
 import React from "react";
 import type { PipelineStage } from "../lib/firewall/schema";
+import { PixelCheck, PixelCross } from "./PixelIcons";
 
 interface InspectionLineProps {
   pipeline: PipelineStage[];
 }
 
-const STATIONS: { key: string; name: string; defaultDetail: string }[] = [
-  { key: "input_contract", name: "1. Input Contract", defaultDetail: "Length boundary & payload type enforcement" },
-  { key: "canonicalization", name: "2. Canonicalise", defaultDetail: "NFKC, homoglyph mapping, de-spacing, decoders" },
-  { key: "signature_scan", name: "3. Signatures", defaultDetail: "Scans all normalized views across weighted threat rules" },
-  { key: "intent_parse", name: "4. Intent Parser", defaultDetail: "Grammar parsing for financial intent, payee, and amount" },
-  { key: "semantic_classifier", name: "5. Semantic Check", defaultDetail: "Groq secondary semantic analysis & canary token probe" },
-  { key: "risk_decision", name: "6. Decision Engine", defaultDetail: "Evaluates risk thresholds (fail-closed if score ≥ 50)" },
-  { key: "policy_engine", name: "7. Policy Engine", defaultDetail: "Enforces per-transaction and daily financial caps" },
-  { key: "tool_dispatch", name: "8. Tool Dispatch", defaultDetail: "Executes mock financial tools with validated arguments" },
+const STATIONS: { num: string; key: string; name: string; defaultDetail: string }[] = [
+  { num: "01", key: "input_contract", name: "Input Contract", defaultDetail: "Length boundary & payload type enforcement" },
+  { num: "02", key: "canonicalization", name: "Canonicalise", defaultDetail: "NFKC, homoglyph mapping, de-spacing, decoders" },
+  { num: "03", key: "signature_scan", name: "Signatures", defaultDetail: "Scans all normalized views across weighted threat rules" },
+  { num: "04", key: "intent_parse", name: "Intent Parser", defaultDetail: "Grammar parsing for financial intent, payee, and amount" },
+  { num: "05", key: "semantic_classifier", name: "Semantic Check", defaultDetail: "Groq secondary semantic analysis & canary token probe" },
+  { num: "06", key: "risk_decision", name: "Decision Engine", defaultDetail: "Evaluates risk thresholds (fail-closed if score ≥ 50)" },
+  { num: "07", key: "policy_engine", name: "Policy Engine", defaultDetail: "Enforces per-transaction and daily financial caps" },
+  { num: "08", key: "tool_dispatch", name: "Tool Dispatch", defaultDetail: "Executes mock financial tools with validated arguments" },
 ];
 
 export function InspectionLine({ pipeline }: InspectionLineProps) {
   // Map pipeline steps by stage
   const stageMap = new Map<string, PipelineStage>();
   pipeline.forEach((p) => stageMap.set(p.stage, p));
-
-  // Determine which station failed, if any
-  const failedStationIndex = STATIONS.findIndex((s) => {
-    const p = stageMap.get(s.key);
-    return p && !p.passed;
-  });
 
   return (
     <div
@@ -71,14 +66,20 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
         <div
           style={{
             position: "absolute",
-            left: "14px",
+            left: "13px",
             top: "14px",
             bottom: "24px",
             width: "1px",
             backgroundColor: "var(--rule)",
             zIndex: 1,
           }}
-        />
+        >
+          {/* Traveling pixel scanner block that sweeps down */}
+          <div
+            key={pipeline.length > 0 ? pipeline[pipeline.length - 1]?.stage : "idle"}
+            className="station-scanner"
+          />
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {STATIONS.map((station, index) => {
@@ -86,20 +87,6 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
             const isReached = Boolean(step);
             const isPassed = step?.passed === true;
             const isStoppedHere = step?.passed === false;
-
-            // Dot style
-            let dotBg = "var(--paper-raised)";
-            let dotBorder = "1.5px solid var(--rule)";
-
-            if (isReached) {
-              if (isPassed) {
-                dotBg = "var(--approve)";
-                dotBorder = "1.5px solid var(--approve)";
-              } else if (isStoppedHere) {
-                dotBg = "var(--block)";
-                dotBorder = "1.5px solid var(--block)";
-              }
-            }
 
             const detailText = step?.detail || station.defaultDetail;
 
@@ -110,37 +97,67 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: "16px",
+                  gap: "14px",
                   position: "relative",
                   zIndex: 2,
-                  animationDelay: `${index * 60}ms`,
+                  animationDelay: `${index * 50}ms`,
                 }}
               >
-                {/* Station Circle Indicator */}
+                {/* Station Icon: PixelCheck, PixelCross, or hollow */}
                 <div
                   style={{
-                    width: "13px",
-                    height: "13px",
-                    borderRadius: "50%",
-                    backgroundColor: dotBg,
-                    border: dotBorder,
-                    marginTop: "3px",
+                    width: "14px",
+                    height: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: "2px",
                     flexShrink: 0,
-                    transition: "background-color 200ms ease, border-color 200ms ease",
-                    boxShadow: isStoppedHere ? "0 0 0 3px var(--block-bg)" : "none",
                   }}
-                />
+                >
+                  {isReached ? (
+                    isPassed ? (
+                      <PixelCheck size={12} style={{ color: "var(--approve)" }} />
+                    ) : (
+                      <PixelCross size={12} style={{ color: "var(--block)" }} />
+                    )
+                  ) : (
+                    <span
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        border: "1.5px solid var(--rule)",
+                        backgroundColor: "var(--paper-raised)",
+                        display: "inline-block",
+                      }}
+                    />
+                  )}
+                </div>
 
-                {/* Station text & mono detail */}
+                {/* Station Station Number (pixel font) + Name + Details */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       display: "flex",
                       alignItems: "baseline",
-                      gap: "10px",
+                      gap: "8px",
                       marginBottom: "2px",
                     }}
                   >
+                    <span
+                      className="font-pixel"
+                      style={{
+                        fontSize: "11px",
+                        color: isStoppedHere
+                          ? "var(--block)"
+                          : isReached
+                          ? "var(--ink-2)"
+                          : "var(--ink-4)",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {station.num}
+                    </span>
                     <span
                       style={{
                         fontSize: "13px",
@@ -156,12 +173,12 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
                     </span>
                     {isStoppedHere && (
                       <span
-                        className="font-mono"
+                        className="font-pixel"
                         style={{
                           fontSize: "10px",
                           color: "var(--block)",
-                          fontWeight: 600,
-                          letterSpacing: "0.06em",
+                          fontWeight: 700,
+                          letterSpacing: "0.05em",
                         }}
                       >
                         [BLOCKED HERE]
@@ -172,7 +189,11 @@ export function InspectionLine({ pipeline }: InspectionLineProps) {
                     className="font-mono"
                     style={{
                       fontSize: "11px",
-                      color: isStoppedHere ? "var(--block)" : isReached ? "var(--ink-2)" : "var(--ink-3)",
+                      color: isStoppedHere
+                        ? "var(--block)"
+                        : isReached
+                        ? "var(--ink-2)"
+                        : "var(--ink-3)",
                       lineHeight: 1.45,
                       wordBreak: "break-word",
                     }}

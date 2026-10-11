@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyze } from "@/lib/firewall";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { recordAuditEvent } from "@/lib/firewall/audit";
 
 export const runtime = "nodejs";
 
@@ -77,6 +78,26 @@ export async function POST(req: NextRequest) {
       { message, memo },
       { dryRun }
     );
+
+    // Record event in bounded audit store (F1 & F4)
+    const stoppingStage =
+      verdict.status === "BLOCKED"
+        ? verdict.pipeline.find((p) => !p.passed)?.stage || "unknown"
+        : "none";
+
+    recordAuditEvent({
+      id: verdict.request_id,
+      timestamp: verdict.timestamp,
+      status: verdict.status,
+      risk_score: verdict.risk_score,
+      threat_category: verdict.threat_category,
+      input_excerpt: (message + (memo ? ` [memo: ${memo}]` : "")).slice(0, 100),
+      message,
+      memo,
+      stopping_stage: stoppingStage,
+      latency_ms: verdict.engine.latency_ms,
+      verdict,
+    });
 
     return NextResponse.json(verdict, {
       status: 200,

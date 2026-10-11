@@ -4,7 +4,7 @@ import React from "react";
 
 export function Architecture() {
   return (
-    <section id="architecture" className="section">
+    <section id="architecture" className="section dot-grid-bg reveal-fadeup">
       <div className="container">
         {/* Section Header */}
         <div style={{ marginBottom: "40px" }}>

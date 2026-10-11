@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Inter_Tight, JetBrains_Mono, Silkscreen } from "next/font/google";
 import "./styles/tokens.css";
 import "./globals.css";
 
@@ -25,6 +25,13 @@ const monoFont = JetBrains_Mono({
   display: "swap",
 });
 
+const pixelFont = Silkscreen({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-pixel",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "BankSim — Blue-Team AI Firewall",
   description:
@@ -42,9 +49,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable}`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} ${pixelFont.variable}`}
     >
       <body>
+        <div className="paper-grain" aria-hidden="true" />
         <svg style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }} aria-hidden="true">
           <filter id="ink-noise" x="0%" y="0%" width="100%" height="100%">
             <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="3" result="noise" />

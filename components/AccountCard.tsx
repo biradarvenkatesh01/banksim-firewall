@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { PAYEES, type BankState, type Payee } from "../lib/firewall/bank";
+import { CountUp } from "./CountUp";
+import { PixelViewfinderCorners } from "./PixelIcons";
 
 interface AccountSnapshotData {
   account_holder?: string;
@@ -66,8 +68,11 @@ export function AccountCard({ state, onReset, isResetting }: AccountCardProps) {
         borderRadius: "var(--radius-md)",
         padding: "24px",
         marginBottom: "24px",
+        position: "relative",
       }}
     >
+      <PixelViewfinderCorners color="var(--ink-3)" size={6} />
+
       {/* Top line: Account header & reset action */}
       <div
         style={{
@@ -147,7 +152,17 @@ export function AccountCard({ state, onReset, isResetting }: AccountCardProps) {
             transition: "color 240ms ease-out",
           }}
         >
-          ₹{balanceRupees}
+          ₹
+          <CountUp
+            value={balanceNumber}
+            duration={400}
+            formatter={(v) =>
+              v.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            }
+          />
         </div>
       </div>
 
@@ -165,16 +180,21 @@ export function AccountCard({ state, onReset, isResetting }: AccountCardProps) {
         >
           <span style={{ color: "var(--ink-3)" }}>DAILY SPEND CAP</span>
           <span className="tnum">
-            ₹{dailySpent.toLocaleString("en-IN")} / ₹{dailyLimit.toLocaleString("en-IN")}
+            ₹
+            <CountUp
+              value={dailySpent}
+              duration={400}
+              formatter={(v) => Math.round(v).toLocaleString("en-IN")}
+            />{" "}
+            / ₹{dailyLimit.toLocaleString("en-IN")}
           </span>
         </div>
         <div
+          className="pixel-bar-mask"
           style={{
             width: "100%",
-            height: "4px",
+            height: "8px",
             backgroundColor: "var(--paper)",
-            borderRadius: "9999px",
-            overflow: "hidden",
             border: "1px solid var(--rule)",
           }}
         >

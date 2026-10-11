@@ -50,7 +50,7 @@ export function RedTeam() {
   };
 
   return (
-    <section id="red-team" className="section">
+    <section id="red-team" className="section reveal-fadeup">
       <div className="container">
         {/* Section Header */}
         <div
@@ -260,7 +260,7 @@ export function RedTeam() {
           >
             {/* Table Header */}
             <div
-              className="font-mono"
+              className="font-pixel"
               style={{
                 display: "grid",
                 gridTemplateColumns: "80px 70px 60px 180px 1fr",
@@ -270,7 +270,7 @@ export function RedTeam() {
                 borderBottom: "1px solid var(--rule)",
                 fontSize: "10px",
                 color: "var(--ink-3)",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.05em",
                 textTransform: "uppercase",
               }}
             >
@@ -286,7 +286,7 @@ export function RedTeam() {
               {results.map((r, i) => (
                 <div
                   key={r.id}
-                  className="font-mono tnum"
+                  className="interactive-table-row font-mono tnum"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "80px 70px 60px 180px 1fr",
@@ -301,12 +301,14 @@ export function RedTeam() {
                   {/* Status chip */}
                   <div>
                     <span
+                      className="font-pixel"
                       style={{
                         display: "inline-block",
                         padding: "2px 6px",
                         borderRadius: "3px",
                         fontSize: "10px",
-                        fontWeight: 600,
+                        fontWeight: 700,
+                        letterSpacing: "0.04em",
                         backgroundColor: r.passed ? "var(--approve-bg)" : "var(--block-bg)",
                         color: r.passed ? "var(--approve)" : "var(--block)",
                       }}
@@ -317,7 +319,11 @@ export function RedTeam() {
 
                   {/* Verdict */}
                   <span
+                    className="font-pixel"
                     style={{
+                      fontSize: "10px",
+                      letterSpacing: "0.04em",
+                      fontWeight: 600,
                       color: r.actualStatus === "APPROVED" ? "var(--approve)" : "var(--block)",
                     }}
                   >
@@ -331,7 +337,10 @@ export function RedTeam() {
 
                   {/* Category */}
                   <span
+                    className="font-pixel"
                     style={{
+                      fontSize: "10px",
+                      letterSpacing: "0.03em",
                       color: r.threat_category === "NONE" ? "var(--ink-3)" : "var(--ink)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",

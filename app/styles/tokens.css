@@ -86,6 +86,99 @@ body {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* Pixel micro-UI (Silkscreen) */
+.font-pixel {
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  letter-spacing: 0.05em;
+}
+
+/* 1. Texture — Fixed full-page SVG paper grain noise overlay */
+.paper-grain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+[data-theme="dark"] .paper-grain {
+  mix-blend-mode: screen;
+  opacity: 0.045;
+}
+
+/* Dot grid background (1px dots, 16px pitch, --rule color) */
+.dot-grid-bg {
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* 2px Dithered / checkerboard strip in --rule */
+.dither-strip {
+  height: 2px;
+  width: 100%;
+  background: repeating-linear-gradient(90deg, var(--rule) 0, var(--rule) 2px, transparent 2px, transparent 4px);
+  opacity: 0.85;
+}
+
+/* Stepped pixel progress bar mask (4px blocks with 1px gaps) */
+.pixel-bar-mask {
+  mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 5px);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 5px);
+}
+
+/* Blinking block caret: ~0.55em wide x 0.85em tall, inline right after headline */
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.hero-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.85em;
+  background-color: var(--navy);
+  margin-left: 0.12em;
+  vertical-align: -0.04em;
+  animation: caretBlink 1s steps(1) infinite;
+  user-select: none;
+}
+
+/* Animated 3-dot pixel loader */
+@keyframes pixelDotsBlink {
+  0% { opacity: 0.2; }
+  33% { opacity: 0.6; }
+  66% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.pixel-dots {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  animation: pixelDotsBlink 800ms steps(3, end) infinite;
+}
+
+/* Inspection line 2px traveling scanner block */
+@keyframes stationScanner {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.station-scanner {
+  position: absolute;
+  left: -2px;
+  width: 5px;
+  height: 2px;
+  background-color: var(--navy);
+  box-shadow: 0 0 2px var(--navy);
+  animation: stationScanner 550ms ease-out forwards;
+}
+
 /* Accessible focus ring */
 :focus-visible {
   outline: 2px solid var(--navy);

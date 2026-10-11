@@ -263,6 +263,23 @@ function scanField(norm: NormalizedText, field: SignalField, isMemo: boolean): S
     for (const view of views) {
       const m = rule.pattern.exec(view.text);
       if (m) {
+        let span: { start: number; end: number } | undefined;
+        let via_view: string | undefined;
+
+        // Match against original plain text (lowercased)
+        const origLower = norm.original.toLowerCase();
+        const origMatch = rule.pattern.exec(origLower);
+
+        // A plain view match occurs when nfkc view matched AND original plain text matches
+        if (view.name === "nfkc" && origMatch) {
+          span = {
+            start: origMatch.index,
+            end: origMatch.index + origMatch[0].length,
+          };
+        } else {
+          via_view = view.name;
+        }
+
         signals.push({
           rule_id: rule.id,
           category: rule.category,
@@ -271,6 +288,8 @@ function scanField(norm: NormalizedText, field: SignalField, isMemo: boolean): S
           field,
           view: view.name,
           evidence: snippet(view.text, m.index, m[0].length),
+          ...(span ? { span } : {}),
+          ...(via_view ? { via_view } : {}),
         });
         break; // first matching view is enough for this rule/field
       }
@@ -287,6 +306,7 @@ function scanField(norm: NormalizedText, field: SignalField, isMemo: boolean): S
       field,
       view: "raw",
       evidence: flag,
+      via_view: flag.toLowerCase(),
     });
   }
 

@@ -74,6 +74,8 @@ export interface Signal {
   view: string;
   /** Short, sanitised excerpt of the matched text. */
   evidence: string;
+  span?: { start: number; end: number };
+  via_view?: string;
 }
 
 export interface PolicyCheck {
@@ -188,6 +190,16 @@ export const VERDICT_JSON_SCHEMA = {
           field: { enum: ["message", "memo", "semantic"] },
           view: { type: "string" },
           evidence: { type: "string" },
+          span: {
+            type: "object",
+            additionalProperties: false,
+            required: ["start", "end"],
+            properties: {
+              start: { type: "integer", minimum: 0 },
+              end: { type: "integer", minimum: 0 },
+            },
+          },
+          via_view: { type: "string" },
         },
       },
     },

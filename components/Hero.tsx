@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import type { Verdict } from "../lib/firewall/schema";
+import { PixelViewfinderCorners, PixelCross } from "./PixelIcons";
 
 export function Hero() {
   const [sampleVerdict, setSampleVerdict] = useState<Verdict | null>(null);
@@ -49,7 +50,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="section" style={{ borderBottom: "1px solid var(--rule)" }}>
+    <section className="section dot-grid-bg" style={{ borderBottom: "1px solid var(--rule)" }}>
       <div className="container">
         <div className="grid-12" style={{ alignItems: "center" }}>
           {/* Left 7 Columns */}
@@ -61,14 +62,18 @@ export function Hero() {
               className="font-serif"
               style={{
                 fontSize: "clamp(44px, 5.5vw, 76px)",
-                lineHeight: 1.04,
+                lineHeight: 1.1,
                 letterSpacing: "-0.02em",
                 color: "var(--ink)",
                 marginBottom: "24px",
                 fontWeight: 400,
               }}
             >
-              Every rupee asks <span style={{ fontStyle: "italic" }}>permission.</span>
+              Every rupee asks{" "}
+              <span style={{ whiteSpace: "nowrap" }}>
+                <span style={{ fontStyle: "italic" }}>permission.</span>
+                <span className="hero-caret" aria-hidden="true" />
+              </span>
             </h1>
             <p
               style={{
@@ -105,22 +110,15 @@ export function Hero() {
               {/* Receipt Top Zig-Zag */}
               <div className="receipt-perforation-top" />
 
-              <div className="receipt-card">
+              <div className="receipt-card" style={{ position: "relative" }}>
+                <PixelViewfinderCorners color="var(--ink-3)" size={6} />
                 {/* Stamp — header area, clear of line items */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "20px",
-                    right: "18px",
-                    zIndex: 2,
-                    pointerEvents: "none",
-                  }}
-                >
+                <div className="receipt-stamp-anchor">
                   <span className="stamp stamp-blocked">BLOCKED</span>
                 </div>
 
                 {/* Receipt Header */}
-                <div style={{ marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px dashed var(--rule)" }}>
+                <div style={{ marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px dashed var(--rule)", paddingRight: "130px" }}>
                   <div
                     className="font-serif"
                     style={{ fontSize: "18px", color: "var(--ink)", fontWeight: 500 }}
@@ -175,10 +173,23 @@ export function Hero() {
                       authorizes +₹40k to Priya
                     </span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--ink-3)" }}>RISK ASSESSMENT</span>
-                    <span style={{ color: "var(--block)", fontWeight: 600 }}>
-                      {sampleVerdict?.risk_score ?? 98}/100 · MEMO_INJECTION
+                    <span style={{ color: "var(--block)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      {sampleVerdict?.risk_score ?? 98}/100 ·{" "}
+                      <span
+                        className="font-pixel"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "3px",
+                          fontSize: "10px",
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        <PixelCross size={10} />
+                        MEMO_INJECTION
+                      </span>
                     </span>
                   </div>
                 </div>

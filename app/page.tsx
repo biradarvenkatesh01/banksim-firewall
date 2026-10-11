@@ -13,12 +13,23 @@ import { AttackLibrary } from "../components/AttackLibrary";
 import { RedTeam } from "../components/RedTeam";
 import { Architecture } from "../components/Architecture";
 import { Footer } from "../components/Footer";
+import { LedgerThreatFeed } from "../components/LedgerThreatFeed";
+import { StressPanel } from "../components/StressPanel";
 import type { BankState } from "../lib/firewall/bank";
 import type { Verdict } from "../lib/firewall/schema";
+import type { StressTestReport } from "../lib/firewall/stress";
+import type { AuditEvent, AuditAnalytics } from "../lib/firewall/audit";
 
 export default function Home() {
   const [bankState, setBankState] = useState<any>(null);
+  const [auditData, setAuditData] = useState<{
+    events: AuditEvent[];
+    threat_feed: AuditEvent[];
+    analytics: AuditAnalytics;
+  } | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [stressReport, setStressReport] = useState<StressTestReport | null>(null);
+  const [stressLoading, setStressLoading] = useState(false);
 
   // Composer form state
   const [message, setMessage] = useState("Transfer 500 to Rahul for lunch");
@@ -42,8 +53,43 @@ export default function Home() {
     }
   };
 
+  // Fetch session audit & threat feed state
+  const fetchAudit = async () => {
+    try {
+      const res = await fetch("/api/audit");
+      if (res.ok) {
+        const data = await res.json();
+        setAuditData(data);
+      }
+    } catch {
+      // Offline fallback
+    }
+  };
+
   useEffect(() => {
     fetchAccount();
+    fetchAudit();
+
+    if (typeof window !== "undefined" && "IntersectionObserver" in window) {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.05 }
+        );
+
+        const targets = document.querySelectorAll(".reveal-fadeup");
+        targets.forEach((el) => observer.observe(el));
+
+        return () => observer.disconnect();
+      }
+    }
   }, []);
 
   // Handle reset
@@ -52,7 +98,7 @@ export default function Home() {
     try {
       const res = await fetch("/api/account/reset", { method: "POST" });
       if (res.ok) {
-        await fetchAccount();
+        await Promise.all([fetchAccount(), fetchAudit()]);
       }
     } finally {
       setIsResetting(false);
@@ -84,7 +130,8 @@ export default function Home() {
       const data: Verdict = await res.json();
       setVerdict(data);
 
-      // Re-fetch after every executed tool
+      // Re-fetch after every analysis (audit feed + ledger)
+      await fetchAudit();
       if (!dryRun) {
         await fetchAccount();
       }
@@ -93,6 +140,30 @@ export default function Home() {
       setError(err?.message || "Analysis request failed.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Submit mutation stress test
+  const handleStressTest = async () => {
+    if (!message.trim() || stressLoading) return;
+    setStressLoading(true);
+    try {
+      const res = await fetch("/api/stress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          memo: memo.trim() || null,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStressReport(data);
+      }
+    } catch {
+      // Offline fallback
+    } finally {
+      setStressLoading(false);
     }
   };
 
@@ -107,9 +178,10 @@ export default function Home() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <TopBar />
       <Hero />
+      <div className="dither-strip" aria-hidden="true" />
 
       {/* Main Console Section */}
-      <section id="console" className="section">
+      <section id="console" className="section reveal-fadeup">
         <div className="container">
           <div style={{ marginBottom: "36px" }}>
             <div className="section-eyebrow">Interactive Security Desk</div>
@@ -121,7 +193,7 @@ export default function Home() {
           </div>
 
           <div className="grid-12">
-            {/* Left Column (5 cols): Account Card + Composer */}
+            {/* Left Column (5 cols): Account Card + Composer + Stress Panel */}
             <div style={{ gridColumn: "span 5" }}>
               <AccountCard
                 state={bankState}
@@ -134,8 +206,16 @@ export default function Home() {
                 onMessageChange={setMessage}
                 onMemoChange={setMemo}
                 onSubmit={handleSubmit}
+                onStressTest={handleStressTest}
+                stressLoading={stressLoading}
+                verdict={verdict}
                 loading={loading}
                 error={error}
+              />
+              <StressPanel
+                report={stressReport}
+                loading={stressLoading}
+                onClose={() => setStressReport(null)}
               />
             </div>
 
@@ -163,9 +243,23 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <div className="dither-strip" aria-hidden="true" />
+
+      {/* F1, F4, F5: Live Account Ledger & Threat Feed */}
+      <LedgerThreatFeed
+        bankState={bankState}
+        auditData={auditData}
+        onSelectVerdict={(v) => {
+          setVerdict(v);
+          const el = document.getElementById("console");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
+      <div className="dither-strip" aria-hidden="true" />
 
       <AttackLibrary onSelectPayload={handleSelectPayload} />
       <RedTeam />
+      <div className="dither-strip" aria-hidden="true" />
       <Architecture />
       <Footer />
     </div>

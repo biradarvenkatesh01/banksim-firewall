@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { PixelBolt } from "./PixelIcons";
 
 interface EngineHealth {
   mode: "rules+llm" | "rules-only";
@@ -131,6 +132,19 @@ export function TopBar() {
               Console
             </a>
             <a
+              href="#ledger"
+              style={{
+                color: "var(--ink-2)",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "color 160ms",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-2)")}
+            >
+              Ledger
+            </a>
+            <a
               href="#attack-library"
               style={{
                 color: "var(--ink-2)",
@@ -191,13 +205,16 @@ export function TopBar() {
           </button>
 
           {/* Engine status pill */}
-          <div className="status-pill" title={`Model: ${engine?.model || "default"}`}>
-            <span
-              className={`status-dot ${
-                engine?.mode === "rules+llm" ? "" : "status-dot-amber"
-              }`}
+          <div className="status-pill font-pixel" title={`Model: ${engine?.model || "default"}`}>
+            <PixelBolt
+              size={11}
+              style={{
+                color: engine?.mode === "rules+llm" ? "var(--approve)" : "var(--amber)",
+              }}
             />
-            <span>{engine?.mode === "rules+llm" ? "Rules + Groq" : "Rules only"}</span>
+            <span style={{ fontSize: "11px", letterSpacing: "0.06em" }}>
+              {engine?.mode === "rules+llm" ? "RULES + GROQ" : "RULES ONLY"}
+            </span>
           </div>
         </nav>
       </div>

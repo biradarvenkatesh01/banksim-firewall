@@ -22,13 +22,46 @@ export interface Payee {
 
 export interface Transaction {
   id: string;
-  type: "DEBIT";
+  type: "DEBIT" | "CREDIT";
   amount_paise: number;
   payee_id: string;
   payee_name: string;
+  counterparty?: string;
   memo: string | null;
   business_date: string;
+  time?: string;
+  running_balance_paise?: number;
+  request_id?: string;
 }
+
+export const SEED_TRANSACTIONS: readonly Transaction[] = Object.freeze([
+  {
+    id: "TXN-00001",
+    type: "CREDIT",
+    amount_paise: 1_00_000_00,
+    payee_id: "payee_employer",
+    payee_name: "Infosys Payroll",
+    counterparty: "Infosys Ltd (Salary)",
+    memo: "Monthly Salary Credit",
+    business_date: "2026-10-01",
+    time: "2026-10-01T09:30:00.000Z",
+    running_balance_paise: 1_00_000_00,
+    request_id: "req_seed_salary",
+  },
+  {
+    id: "TXN-00002",
+    type: "DEBIT",
+    amount_paise: 15_000_00,
+    payee_id: "payee_suresh",
+    payee_name: "Suresh Kumar",
+    counterparty: "Suresh Kumar (Landlord)",
+    memo: "Rent Advance Oct 2026",
+    business_date: "2026-10-03",
+    time: "2026-10-03T14:15:00.000Z",
+    running_balance_paise: 85_000_00,
+    request_id: "req_seed_rent",
+  },
+]);
 
 export interface BankState {
   account_holder: string;
@@ -122,6 +155,38 @@ export function formatINR(paise: number): string {
 
 /** Public, serialisable snapshot of the account (used by GET /api/account). */
 export function accountSnapshot(state: BankState) {
+  const seedItems = SEED_TRANSACTIONS.map((t) => ({
+    id: t.id,
+    type: t.type,
+    amount_paise: t.amount_paise,
+    amount: (t.type === "CREDIT" ? 1 : -1) * (t.amount_paise / 100),
+    amount_display: `${t.type === "CREDIT" ? "+" : "-"}${formatINR(t.amount_paise)}`,
+    counterparty: t.counterparty ?? t.payee_name,
+    memo: t.memo,
+    time: t.time ?? "2026-10-01T09:30:00.000Z",
+    business_date: t.business_date,
+    running_balance: (t.running_balance_paise ?? INITIAL_BALANCE_PAISE) / 100,
+    running_balance_display: formatINR(t.running_balance_paise ?? INITIAL_BALANCE_PAISE),
+    request_id: t.request_id ?? "req_seed",
+  }));
+
+  const historyItems = state.history.map((t) => ({
+    id: t.id,
+    type: t.type ?? "DEBIT",
+    amount_paise: t.amount_paise,
+    amount: -1 * (t.amount_paise / 100),
+    amount_display: `-${formatINR(t.amount_paise)}`,
+    counterparty: t.counterparty ?? t.payee_name,
+    memo: t.memo,
+    time: t.time ?? new Date().toISOString(),
+    business_date: t.business_date,
+    running_balance: (t.running_balance_paise ?? state.balance_paise) / 100,
+    running_balance_display: formatINR(t.running_balance_paise ?? state.balance_paise),
+    request_id: t.request_id ?? "req_manual",
+  }));
+
+  const transactions = [...historyItems.slice().reverse(), ...seedItems.slice().reverse()];
+
   return {
     account_holder: state.account_holder,
     account_masked: state.account_masked,
@@ -140,6 +205,7 @@ export function accountSnapshot(state: BankState) {
       verified: p.verified,
     })),
     history: state.history.map((t) => ({ ...t, amount: t.amount_paise / 100 })),
+    transactions,
   };
 }
 
@@ -249,8 +315,11 @@ function transfer(state: BankState, args: unknown) {
     amount_paise,
     payee_id: payee.id,
     payee_name: payee.name,
+    counterparty: payee.name,
     memo: (memo as string | null | undefined) ?? null,
     business_date: state.business_date,
+    time: new Date().toISOString(),
+    running_balance_paise: state.balance_paise - amount_paise,
   };
   state.next_txn_seq += 1;
   state.balance_paise -= amount_paise;

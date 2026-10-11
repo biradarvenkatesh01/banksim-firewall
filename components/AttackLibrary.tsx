@@ -74,7 +74,7 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
   };
 
   return (
-    <section id="attack-library" className="section">
+    <section id="attack-library" className="section reveal-fadeup">
       <div className="container">
         {/* Section Header */}
         <div style={{ marginBottom: "32px" }}>
@@ -148,15 +148,15 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--paper)")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--paper-raised)")}
             >
-              {/* Category in mono small caps */}
+              {/* Category in pixel font */}
               <div>
                 <span
-                  className="font-mono"
+                  className="font-pixel"
                   style={{
-                    fontSize: "10px",
-                    fontWeight: 600,
+                    fontSize: "11px",
+                    fontWeight: 700,
                     color: c.expectedStatus === "BLOCKED" ? "var(--block)" : "var(--approve)",
-                    letterSpacing: "0.06em",
+                    letterSpacing: "0.04em",
                     textTransform: "uppercase",
                   }}
                 >

@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { Verdict } from "../lib/firewall/schema";
+import { PixelCheck, PixelCross, PixelViewfinderCorners } from "./PixelIcons";
 
 interface ReceiptProps {
   verdict: Verdict | null;
@@ -95,17 +96,15 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
       {/* Top Zig-Zag edge */}
       <div className="receipt-perforation-top" />
 
-      <div className="receipt-card">
-        {/* Rubber Stamp Hero Moment — header area, clear of line items */}
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "20px",
-            zIndex: 10,
-            pointerEvents: "none",
-          }}
-        >
+      <div
+        key={verdict.request_id}
+        className="receipt-card receipt-print-reveal"
+        style={{ position: "relative" }}
+      >
+        <PixelViewfinderCorners color="var(--ink-3)" size={6} />
+
+        {/* Rubber Stamp Hero Moment — clamped and scaled inside header */}
+        <div className="receipt-stamp-anchor">
           <span
             key={verdict.request_id}
             className={`stamp ${isApproved ? "stamp-approved" : "stamp-blocked"}`}
@@ -120,6 +119,7 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
             borderBottom: "1px dashed var(--rule)",
             paddingBottom: "16px",
             marginBottom: "16px",
+            paddingRight: "140px",
           }}
         >
           <div
@@ -146,14 +146,21 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
             marginBottom: "16px",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ color: "var(--ink-3)" }}>VERDICT</span>
             <span
+              className="font-pixel"
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
                 color: isApproved ? "var(--approve)" : "var(--block)",
+                fontSize: "11px",
                 fontWeight: 600,
+                letterSpacing: "0.04em",
               }}
             >
+              {isApproved ? <PixelCheck size={11} /> : <PixelCross size={11} />}
               {verdict.status} ({verdict.threat_category})
             </span>
           </div>

@@ -323,9 +323,17 @@ function cleanExplanation(s: string): string {
       toolDetail = `Dry run: ${toolToExecute} validated but not executed against ledger.`;
       executionResult = { simulated: true, tool: toolToExecute, args: toolArgs };
     } else {
-      try {
+        try {
         executionResult = executeTool(bankState, toolToExecute, toolArgs);
         toolDetail = `Tool ${toolToExecute} executed successfully.`;
+        if (toolToExecute === "transfer" && bankState.history.length > 0) {
+          const lastTxn = bankState.history[bankState.history.length - 1];
+          if (lastTxn) {
+            lastTxn.request_id = requestId;
+            lastTxn.time = timestamp;
+            lastTxn.running_balance_paise = bankState.balance_paise;
+          }
+        }
       } catch (err) {
         toolPassed = false;
         const msg = err instanceof ToolError ? err.message : String(err);

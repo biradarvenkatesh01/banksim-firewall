@@ -1080,8 +1080,8 @@ MEMO: None
 
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             {/* Slide Counter */}
-            <div className="font-mono tnum" style={{ fontSize: "12px", color: "var(--ink-2)" }}>
-              Slide {slide.number} / {String(SLIDES.length).padStart(2, "0")}
+            <div className="font-pixel tnum" style={{ fontSize: "11px", color: "var(--ink-2)", letterSpacing: "0.06em" }}>
+              SLIDE {slide.number} / {String(SLIDES.length).padStart(2, "0")}
             </div>
 
             {/* Navigation buttons */}
@@ -1121,6 +1121,8 @@ MEMO: None
           </div>
         </header>
 
+        <div className="dither-strip" aria-hidden="true" />
+
         {/* Main Slide Content Area */}
         <main
           style={{
@@ -1151,11 +1153,11 @@ MEMO: None
             {/* Slide Header */}
             <div>
               <div
-                className="font-mono"
+                className="font-pixel"
                 style={{
                   fontSize: "11px",
                   color: "var(--ink-3)",
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.06em",
                   textTransform: "uppercase",
                   marginBottom: "8px",
                 }}
@@ -1206,7 +1208,7 @@ MEMO: None
               <div className="font-mono" style={{ fontSize: "11px", color: "var(--ink-3)" }}>
                 Use ← and → keys to navigate
               </div>
-              <div className="font-mono tnum" style={{ fontSize: "11px", color: "var(--ink-3)" }}>
+              <div className="font-pixel tnum" style={{ fontSize: "11px", color: "var(--ink-3)", letterSpacing: "0.06em" }}>
                 {slide.number} of {String(SLIDES.length).padStart(2, "0")}
               </div>
             </div>
