@@ -106,12 +106,12 @@ export function Hero() {
               <div className="receipt-perforation-top" />
 
               <div className="receipt-card">
-                {/* Stamp — overlapping top-right of line items */}
+                {/* Stamp — header area, clear of line items */}
                 <div
                   style={{
                     position: "absolute",
-                    top: "76px",
-                    right: "16px",
+                    top: "20px",
+                    right: "18px",
                     zIndex: 2,
                     pointerEvents: "none",
                   }}

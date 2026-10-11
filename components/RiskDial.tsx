@@ -165,21 +165,21 @@ export function RiskDial({ score }: RiskDialProps) {
             );
           })()}
 
-          {/* Outside Labels: 10px mono, leader-free placement */}
+          {/* Outside Labels: 10px mono with >=6px clearance */}
           <text
-            x="34"
-            y="54"
+            x="36"
+            y="76"
             fill="var(--amber)"
             fontSize="10"
             fontFamily="var(--font-mono)"
-            textAnchor="start"
+            textAnchor="end"
             fontWeight="500"
           >
             grey 25
           </text>
           <text
             x="120"
-            y="22"
+            y="16"
             fill="var(--block)"
             fontSize="10"
             fontFamily="var(--font-mono)"

@@ -96,11 +96,11 @@ export function Receipt({ verdict, loading }: ReceiptProps) {
       <div className="receipt-perforation-top" />
 
       <div className="receipt-card">
-        {/* Rubber Stamp Hero Moment — overlapping top-right of line items */}
+        {/* Rubber Stamp Hero Moment — header area, clear of line items */}
         <div
           style={{
             position: "absolute",
-            top: "82px",
+            top: "20px",
             right: "20px",
             zIndex: 10,
             pointerEvents: "none",

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-const GITHUB_REPO_URL = "https://github.com/promptwars-uvce/banksim-firewall";
+const GITHUB_REPO_URL = "https://github.com/biradarvenkatesh01/banksim-firewall";
 
 export function Footer() {
   return (
@@ -42,13 +42,20 @@ export function Footer() {
           <span>Zero-Trust AI Guardrails</span>
         </div>
 
-        <div>
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <a
+            href="/deck"
+            className="font-mono btn-link"
+            style={{ fontSize: "12px", color: "var(--ink-2)", fontWeight: 500 }}
+          >
+            Architecture Deck ↗
+          </a>
           <a
             href={GITHUB_REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono btn-link"
-            style={{ fontSize: "12px", color: "var(--ink-2)" }}
+            style={{ fontSize: "12px", color: "var(--ink-3)" }}
           >
             GitHub Repository ↗
           </a>

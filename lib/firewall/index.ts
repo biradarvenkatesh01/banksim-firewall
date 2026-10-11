@@ -76,6 +76,17 @@ export async function analyze(
     result: null,
   };
 
+function stripDot(s: string): string {
+  return s.trim().replace(/\.+$/, "");
+}
+
+function cleanExplanation(s: string): string {
+  return s
+    .replace(/\.{2,}/g, ".")
+    .replace(/\s+\./g, ".")
+    .trim();
+}
+
   // -------------------------------------------------------------
   // [0] Input Contract Stage
   // -------------------------------------------------------------
@@ -92,7 +103,7 @@ export async function analyze(
       status: "BLOCKED",
       risk_score: 100,
       threat_category: "INVALID_INPUT",
-      explanation: `Blocked at input boundary: ${contractResult.reason}. No tools were executed.`,
+      explanation: cleanExplanation(`Blocked at input boundary: ${stripDot(contractResult.reason)}. No tools were executed.`),
       intent: "UNKNOWN",
       parsed_request: null,
       signals: [],
@@ -224,9 +235,11 @@ export async function analyze(
       status: "BLOCKED",
       risk_score: currentRisk,
       threat_category: threat,
-      explanation: `Blocked by AI Firewall (${threat}): ${riskDecision.reason} Evidence: ${
-        signals.map((s) => s.label).join("; ") || "Pattern heuristic match"
-      }. No financial tools were executed.`,
+      explanation: cleanExplanation(
+        `Blocked by AI Firewall (${threat}): ${stripDot(riskDecision.reason)}. Evidence: ${
+          signals.map((s) => s.label).join("; ") || "Pattern heuristic match"
+        }. No financial tools were executed.`
+      ),
       intent: parseResult.intent,
       parsed_request: parseResult.parsed_request,
       signals,
@@ -261,7 +274,9 @@ export async function analyze(
       status: "BLOCKED",
       risk_score: Math.max(currentRisk, 30),
       threat_category: policyEval.category,
-      explanation: `Blocked by Policy Guardrails (${policyEval.category}): ${policyEval.explanation}. No financial tools were executed.`,
+      explanation: cleanExplanation(
+        `Blocked by Policy Guardrails (${policyEval.category}): ${stripDot(policyEval.explanation)}. No financial tools were executed.`
+      ),
       intent: parseResult.intent,
       parsed_request: parseResult.parsed_request,
       signals,
@@ -327,7 +342,7 @@ export async function analyze(
           status: "BLOCKED",
           risk_score: Math.max(currentRisk, 40),
           threat_category: "POLICY_VIOLATION",
-          explanation: `Tool execution failed: ${msg}. State remained unaltered.`,
+          explanation: cleanExplanation(`Tool execution failed: ${stripDot(msg)}. State remained unaltered.`),
           intent: parseResult.intent,
           parsed_request: parseResult.parsed_request,
           signals,
@@ -358,13 +373,15 @@ export async function analyze(
     detail: toolDetail,
   });
 
-  const finalExplanation = toolToExecute
-    ? `Request APPROVED. Safely routed to financial tool '${toolToExecute}' (${
-        dryRun ? "dry run" : "executed"
-      }).`
-    : parseResult.intent === "HELP"
-    ? "Request APPROVED. Welcome to BankSim AI Assistant! I can help you check your account balance, view recent transaction history, or transfer funds to registered payees."
-    : "Request APPROVED. Validated as safe informational banking request.";
+  const finalExplanation = cleanExplanation(
+    toolToExecute
+      ? `Request APPROVED. Safely routed to financial tool '${toolToExecute}' (${
+          dryRun ? "dry run" : "executed"
+        }).`
+      : parseResult.intent === "HELP"
+      ? "Request APPROVED. Welcome to BankSim AI Assistant! I can help you check your account balance, view recent transaction history, or transfer funds to registered payees."
+      : "Request APPROVED. Validated as safe informational banking request."
+  );
 
   return {
     request_id: requestId,

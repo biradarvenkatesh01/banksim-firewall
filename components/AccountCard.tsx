@@ -30,7 +30,7 @@ export function AccountCard({ state, onReset, isResetting }: AccountCardProps) {
       ? state.balance
       : state?.balance_paise != null
       ? state.balance_paise / 100
-      : 75000;
+      : 85000;
 
   const balanceRupees = balanceNumber.toLocaleString("en-IN", {
     minimumFractionDigits: 2,
