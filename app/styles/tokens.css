@@ -1,0 +1,103 @@
+:root {
+  /* Palette — Paper, Ink and Two Signals */
+  --paper: #F5F2EC;
+  --paper-raised: #FBFAF7;
+  --paper-translucent: rgba(245, 242, 236, 0.88);
+  --ink: #15171C;
+  --ink-2: #4A4F5A;
+  --ink-3: #8A8F99;
+  --rule: #DED9CF;
+  --navy: #1C2E4A;
+  --navy-hover: #132034;
+  --approve: #1E6B4F;
+  --approve-bg: rgba(30, 107, 79, 0.08);
+  --block: #C4421A;
+  --block-bg: rgba(196, 66, 26, 0.08);
+  --amber: #B7791F;
+  --amber-bg: rgba(183, 121, 31, 0.08);
+
+  /* Elevation & Shadows */
+  --shadow-receipt: 0 12px 36px -8px rgba(21, 23, 28, 0.08), 0 2px 6px rgba(21, 23, 28, 0.04);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+
+  /* Layout */
+  --max-width: 1200px;
+  --header-height: 64px;
+}
+
+[data-theme="dark"] {
+  --paper: #121317;
+  --paper-raised: #1A1C22;
+  --paper-translucent: rgba(18, 19, 23, 0.92);
+  --ink: #F0EDE6;
+  --ink-2: #A0A5B0;
+  --ink-3: #656A76;
+  --rule: #272A33;
+  --navy: #3D5A80;
+  --navy-hover: #4F709C;
+  --approve: #2A9D6F;
+  --approve-bg: rgba(42, 157, 111, 0.14);
+  --block: #E05A32;
+  --block-bg: rgba(224, 90, 50, 0.14);
+  --amber: #D48D2E;
+  --amber-bg: rgba(212, 141, 46, 0.14);
+  --shadow-receipt: 0 16px 40px -8px rgba(0, 0, 0, 0.4);
+}
+
+/* Base resets & typography helpers */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--paper);
+  color: var(--ink);
+  line-height: 1.5;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Tabular numerals for money, scores, and metrics */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Serif display */
+.font-serif {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Mono code/data */
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

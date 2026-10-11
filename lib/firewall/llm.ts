@@ -35,7 +35,7 @@ export interface SemanticClassificationResult {
 // In-memory cache keyed by SHA-256(message + "||" + memo)
 const VERDICT_CACHE = new Map<string, SemanticVerdict>();
 
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+const DEFAULT_MODEL = "openai/gpt-oss-120b";
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 const TIMEOUT_MS = 8000;
 
@@ -64,7 +64,9 @@ export async function classifyWithLLM(
     return { enabled: false, verdict: null, latency_ms: 0 };
   }
 
-  const model = process.env.GROQ_MODEL?.trim() || DEFAULT_MODEL;
+  let rawModel = (process.env.GROQ_MODEL || DEFAULT_MODEL).replace(/^["']|["']$/g, "").trim();
+  rawModel = rawModel.replace(/\s*-\s*on_demand/i, "").trim();
+  const model = rawModel || DEFAULT_MODEL;
 
   // Compute input fingerprint
   const cacheKey = crypto
@@ -163,8 +165,11 @@ Analyze strictly and return the JSON decision.`;
     // Validate structure
     const isAttack = Boolean(parsed.is_attack);
     let category: AttackCategory | "NONE" = "NONE";
-    if (typeof parsed.category === "string" && ATTACK_CATEGORIES.includes(parsed.category as AttackCategory)) {
-      category = parsed.category as AttackCategory;
+    const rawCat = String(parsed.category || "").toUpperCase().replace(/[\s-]+/g, "_");
+    if (ATTACK_CATEGORIES.includes(rawCat as AttackCategory)) {
+      category = rawCat as AttackCategory;
+    } else if (rawCat.includes("SOCIAL") || rawCat.includes("ENGINEER") || rawCat.includes("IMPERSONAT") || rawCat.includes("SCAM") || rawCat.includes("FRAUD")) {
+      category = "SOCIAL_ENGINEERING";
     } else if (isAttack) {
       category = "PROMPT_INJECTION";
     }
