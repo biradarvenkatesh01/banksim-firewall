@@ -18,6 +18,7 @@ This file records every prompt given to the Google Antigravity agent to build Ba
 | **10** | Standout features — ledger, threat feed, evidence, stress test | Add live ledger, bounded threat feed & audit store, character-level evidence highlighting, mutation stress-test generator, and session analytics strip. |
 | **11** | Visual identity — paper texture, pixel accents, motion | Risograph paper grain, 1-bit dither dividers, Silkscreen pixel font for micro-UI, crisp SVG pixel icons, and dot-matrix receipt printing motion. |
 | **12** | Visual QA fixes — caret, mobile stamp | Fix hero caret sizing and inline flow; clamp receipt stamp on mobile (390px) to prevent card overflow. |
+| **13** | Attack Library label overlap fix | Expand Attack Library column width, make category chips wrap safely with underscores replaced by spaces, and stack responsively under 700px. |
 
 ---
 
@@ -413,5 +414,23 @@ Log this prompt using the new log format (title: "Visual QA fixes — caret, mob
 1. HERO CARET BUG: the blinking block caret after "Every rupee asks permission." renders as a huge navy rectangle that overlaps the word "asks" (desktop 1536px). It must sit inline right after the final full stop of "permission.", on the same baseline, sized to ~0.55em wide × 0.85em tall of the headline (or simply the "▌" glyph inline in the pixel font at the headline's font-size), never absolutely positioned over text. Verify at 1536px, 1280px and 390px.
 2. MOBILE STAMP BUG: at 390px the APPROVED/BLOCKED stamp on the receipt spills outside the left edge of the card. Clamp it inside the receipt header on narrow screens (scale it down ~0.75 and anchor to the right edge of the header; overflow must stay inside the card). Check the hero mini-receipt too.
 3. Run `npx tsc --noEmit`, `npm test` and `npm run build`; report results in chat. Keep the dev server running.
+```
+
+---
+
+## Prompt 13 — Attack Library label overlap fix
+
+_Phase: Visual QA & Micro-Polish · Model: Gemini 3.8 Flash_
+
+```text
+Log this prompt using the new log format (title: "Attack Library label overlap fix"). No git commands. URGENT, keep it minimal.
+
+BUG: In the Attack Library rows, the category label in the pixel font (e.g. "PROMPT_INJECTION", "MEMO_INJECTION", "TRANSACTION_MANIPULATION") is wider than its grid column, so it overlaps the payload text next to it (seen at 1660px desktop).
+FIX in AttackLibrary.tsx only:
+- Make the first column wide enough and safe: grid-template-columns: minmax(200px, 240px) 1fr auto; add column-gap 24px.
+- Category label: font-size 10px, letter-spacing 0.04em, replace "_" with a space for display, allow wrapping (white-space: normal; overflow-wrap: anywhere; line-height 1.3) so it can never bleed into the payload column.
+- At <700px stack the row: label + id on top, payload below, "Try →" right-aligned.
+Apply the same overflow-safe treatment to any other pixel-font category chips that sit in table columns (Threat Feed, Red Team table, Stress panel).
+Then run `npx tsc --noEmit` and `npm run build` and reply "done" in chat. Do not do browser testing.
 ```
 

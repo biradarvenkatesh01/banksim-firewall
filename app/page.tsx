@@ -221,14 +221,7 @@ export default function Home() {
 
             {/* Right Column (7 cols): Verdict Receipt + Dial + Inspection Line + Raw JSON */}
             <div style={{ gridColumn: "span 7" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 240px",
-                  gap: "24px",
-                  marginBottom: "24px",
-                }}
-              >
+              <div className="receipt-dial-grid">
                 <div style={{ minWidth: 0 }}>
                   <Receipt verdict={verdict} loading={loading} />
                 </div>

@@ -273,6 +273,49 @@
   overflow: hidden;
 }
 
+/* Responsive grid for Receipt + RiskDial */
+.receipt-dial-grid {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .receipt-dial-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Responsive row for Attack Library */
+.attack-lib-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) 1fr auto;
+  column-gap: 24px;
+  row-gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .attack-lib-row {
+    grid-template-columns: 1fr auto;
+  }
+  .attack-lib-row .attack-lib-meta {
+    grid-column: 1 / 2;
+    order: 1;
+  }
+  .attack-lib-row .attack-lib-action {
+    grid-column: 2 / 3;
+    order: 2;
+    text-align: right;
+  }
+  .attack-lib-row .attack-lib-payload {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
 /* Rubber stamp anchor — scaled and clamped inside header on mobile */
 .receipt-stamp-anchor {
   position: absolute;

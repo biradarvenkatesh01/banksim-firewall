@@ -181,8 +181,21 @@ export function StressPanel({ report, loading, onClose }: StressPanelProps) {
                   >
                     {v.risk_score}
                   </td>
-                  <td style={{ padding: "8px 6px", color: "var(--ink-2)", fontSize: "11px" }}>
-                    {v.threat_category}
+                  <td style={{ padding: "8px 6px" }}>
+                    <span
+                      className="font-pixel"
+                      style={{
+                        fontSize: "10px",
+                        letterSpacing: "0.04em",
+                        color: "var(--ink-2)",
+                        whiteSpace: "normal",
+                        overflowWrap: "anywhere",
+                        lineHeight: 1.3,
+                        display: "inline-block",
+                      }}
+                    >
+                      {v.threat_category.replace(/_/g, " ")}
+                    </span>
                   </td>
                 </tr>
               );

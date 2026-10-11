@@ -514,7 +514,7 @@ export function LedgerThreatFeed({
                       <td style={{ padding: "8px 6px", color: "var(--ink-3)", whiteSpace: "nowrap" }}>
                         {formatTime(ev.timestamp)}
                       </td>
-                      <td style={{ padding: "8px 6px", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "8px 6px" }}>
                         <span
                           className="font-pixel"
                           style={{
@@ -529,10 +529,13 @@ export function LedgerThreatFeed({
                             backgroundColor: "var(--block-bg)",
                             color: "var(--block)",
                             border: "1px solid var(--block)",
+                            whiteSpace: "normal",
+                            overflowWrap: "anywhere",
+                            lineHeight: 1.3,
                           }}
                         >
                           <PixelWarning size={10} />
-                          {ev.threat_category}
+                          {ev.threat_category.replace(/_/g, " ")}
                         </span>
                       </td>
                       <td

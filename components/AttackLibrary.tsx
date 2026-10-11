@@ -136,11 +136,8 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
           {cases.map((c, idx) => (
             <div
               key={c.id}
+              className="attack-lib-row"
               style={{
-                display: "grid",
-                gridTemplateColumns: "100px 1fr 90px",
-                gap: "16px",
-                alignItems: "center",
                 padding: "14px 20px",
                 borderBottom: idx === cases.length - 1 ? "none" : "1px solid var(--rule)",
                 transition: "background-color 160ms",
@@ -149,18 +146,24 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--paper-raised)")}
             >
               {/* Category in pixel font */}
-              <div>
+              <div className="attack-lib-meta">
                 <span
                   className="font-pixel"
                   style={{
-                    fontSize: "11px",
+                    fontSize: "10px",
                     fontWeight: 700,
                     color: c.expectedStatus === "BLOCKED" ? "var(--block)" : "var(--approve)",
                     letterSpacing: "0.04em",
                     textTransform: "uppercase",
+                    whiteSpace: "normal",
+                    overflowWrap: "anywhere",
+                    lineHeight: 1.3,
+                    display: "inline-block",
                   }}
                 >
-                  {c.expectedCategory === "NONE" ? "LEGIT" : c.expectedCategory}
+                  {c.expectedCategory && c.expectedCategory !== "NONE"
+                    ? c.expectedCategory.replace(/_/g, " ")
+                    : "LEGIT"}
                 </span>
                 <div
                   className="font-mono tnum"
@@ -171,7 +174,7 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
               </div>
 
               {/* Payload text in mono */}
-              <div style={{ minWidth: 0 }}>
+              <div className="attack-lib-payload" style={{ minWidth: 0 }}>
                 <div
                   className="font-mono"
                   style={{
@@ -204,7 +207,7 @@ export function AttackLibrary({ onSelectPayload }: AttackLibraryProps) {
               </div>
 
               {/* Action Button */}
-              <div style={{ textAlign: "right" }}>
+              <div className="attack-lib-action">
                 <button
                   type="button"
                   onClick={() => handleTry(c)}

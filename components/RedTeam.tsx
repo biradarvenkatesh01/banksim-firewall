@@ -340,15 +340,16 @@ export function RedTeam() {
                     className="font-pixel"
                     style={{
                       fontSize: "10px",
-                      letterSpacing: "0.03em",
+                      letterSpacing: "0.04em",
                       color: r.threat_category === "NONE" ? "var(--ink-3)" : "var(--ink)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
+                      whiteSpace: "normal",
+                      overflowWrap: "anywhere",
+                      lineHeight: 1.3,
+                      display: "inline-block",
                     }}
                     title={r.threat_category}
                   >
-                    {r.threat_category}
+                    {r.threat_category.replace(/_/g, " ")}
                   </span>
 
                   {/* Payload */}
